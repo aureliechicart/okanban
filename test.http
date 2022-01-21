@@ -1,0 +1,84 @@
+### service indisponible
+GET http://localhost:5050/404
+
+############################## LISTS #############################
+
+### récupération de toutes les listes
+GET http://localhost:5050/lists
+
+### récupération d'une liste
+GET http://localhost:5050/lists/1
+
+### création d'une liste
+POST http://localhost:5050/lists
+Content-Type: application/x-www-form-urlencoded
+
+name=liste test post
+&position=1
+
+### modification d'une liste
+PATCH http://localhost:5050/lists/1
+Content-Type: application/x-www-form-urlencoded
+
+name=liste test patch
+&position=1
+
+### création d'une liste via PUT
+PUT http://localhost:5050/lists
+Content-Type: application/x-www-form-urlencoded
+
+name=liste test put 3
+&position=2
+
+### modification d'une liste via PUT
+PUT http://localhost:5050/lists/2
+Content-Type: application/x-www-form-urlencoded
+
+name=liste test put 1
+&position=1
+
+### suppression d'une liste
+DELETE http://localhost:5050/lists/5
+
+############################## CARDS #############################
+
+### récupération de toutes les cartes d'une liste
+GET http://localhost:5050/lists/9/cards
+
+### récupération d'une carte
+GET http://localhost:5050/cards/4
+
+### création d'une carte
+POST http://localhost:5050/cards
+Content-Type: application/x-www-form-urlencoded
+
+content=carte test post
+&color=#f0f
+&list_id=1
+
+### modification d'une carte
+PATCH http://localhost:5050/cards/1
+Content-Type: application/x-www-form-urlencoded
+
+content=carte test patch
+&color=#f0f
+&position=1
+
+### création d'une carte via PUT
+PUT http://localhost:5050/cards
+Content-Type: application/x-www-form-urlencoded
+
+content=carte test put 3
+&color=#f0f
+&list_id=1
+
+### modification d'une carte via PUT
+PUT http://localhost:5050/cards/2
+Content-Type: application/x-www-form-urlencoded
+
+content=carte test put 1
+&color=#f0f
+&position=1
+
+### suppression d'une carte
+DELETE http://localhost:5050/cards/5
