@@ -82,3 +82,48 @@ content=carte test put 1
 
 ### suppression d'une carte
 DELETE http://localhost:5050/cards/5
+
+############################## TAGS #############################
+
+### récupération de tous les tagss
+GET http://localhost:5050/tags
+
+### création d'un tags
+POST http://localhost:5050/tags
+Content-Type: application/x-www-form-urlencoded
+
+name=urgentissime
+&color=#f0f
+
+### modification d'un tags
+PATCH http://localhost:5050/tags/1
+Content-Type: application/x-www-form-urlencoded
+
+name=URGENT
+&color=#F0F
+
+### création d'un tags via PUT
+PUT http://localhost:5050/tags
+Content-Type: application/x-www-form-urlencoded
+
+name=tags put 3
+&color=#f0f
+
+### modification d'un tags via PUT
+PUT http://localhost:5050/tags/2
+Content-Type: application/x-www-form-urlencoded
+
+name=tags put 1
+&color=#f0f
+
+### suppression d'un tag
+DELETE http://localhost:5050/tags/2
+
+### associer un tag à une carte
+POST http://localhost:5050/cards/2/tags
+Content-Type: application/x-www-form-urlencoded
+
+tag_id=1
+
+### dissocier un tag d'une carte
+DELETE http://localhost:5050/cards/2/tags/1
