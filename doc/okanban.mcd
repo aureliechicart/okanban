@@ -1,0 +1,7 @@
+LISTE: nom, ordre
+:
+LIBELLÉ: nom, couleur
+
+APPARTIENT, 11 CARTE, 0N LISTE
+CARTE: _description, couleur, ordre
+AVOIR, 0N LIBELLÉ, 0N CARTE
