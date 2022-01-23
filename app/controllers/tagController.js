@@ -96,7 +96,7 @@ const tagController = {
 
   associateTagToCard: async (req, res) => {
     try {
-      console.log(req.body);
+      // console.log(req.body);
       const cardId = req.params.id;
       const tagId = req.body.tag_id;
 

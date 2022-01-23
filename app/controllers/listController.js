@@ -18,7 +18,7 @@ const listController = {
           ['cards', 'position', 'ASC']
         ]
       });
-      console.log(lists);
+      // console.log(lists);
       res.json(lists);
     } catch (error) {
       console.log(error);

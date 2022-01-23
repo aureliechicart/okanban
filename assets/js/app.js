@@ -1,39 +1,63 @@
 const app = {
+  base_url: 'http://localhost:5050',
 
   // init function, laucnhed upon page load
-  init: function () {
+  init: async function () {
     console.log('app.init !');
-    //adding method that will handle the adding done by event listeners
+
+    //we dispatch the base_url info to the modules which need it
+    listModule.setBaseUrl(app.base_url);
+    cardModule.setBaseUrl(app.base_url);
+    tagModule.setBaseUrl(app.base_url);
+
+    // upon page load, we want to get the existsing lists in DB
+    // we declared the init method as async: we can wait for the getListsFromAPI function to finish its before running the next instructions
+    await app.getListsFromAPI();
+    // adding method that will handle the adding done by event listeners
     app.addListenerToActions();
   },
 
   addListenerToActions: () => {
     // on the add button of lists, we add an event listener to open the modal
     const button = document.getElementById('addListButton');
-    button.addEventListener('click', app.showAddListModal);
-    console.log(button);
+    button.addEventListener('click', listModule.showAddListModal);
 
-    // we target all the elements with class 'close' to add an event listerner to them, which will close the modal
-    const closeButtons = document.querySelectorAll('.close');
-    for (const closeButton of closeButtons) {
-      closeButton.addEventListener('click', app.hideModals);
+    // we target the close and X buttons and the modal background to add an event listerner to them, which will close the modal
+    const closeElements = document.querySelectorAll('.close, .modal-close, .modal-background');
+    for (const closeElement of closeElements) {
+      closeElement.addEventListener('click', app.hideModals);
     }
 
     // we target the add form of any list 
     const form = document.querySelector('#addListModal form');
-    console.log(form);
     form.addEventListener('submit', app.handleAddListForm);
 
+    // In the version without real data, we were adding an EventListener on all add card buttons for the hard-coded lists in the HTML
+    // Now we go through the API to retrieve rela data, calling the method which will register all the listeners will happen after lists are generated in HTML
+    // We have included adding the EventListener at the creation of the list, we don't need to add it here
+
     // we target the '+' buttons of any card
-    const addCardButtons = document.getElementsByClassName('button--add-card');
-    for (const button of addCardButtons) {
-      button.addEventListener('click', app.showAddCardModal);
-    }
+    // const addCardButtons = document.getElementsByClassName('button--add-card');
+    // for (const button of addCardButtons) {
+    //   button.addEventListener('click', app.showAddCardModal);
+    // }
 
     // we target the add form of any card
     const cardForm = document.querySelector('#addCardModal form');
     cardForm.addEventListener('submit', app.handleAddCardForm);
+  },
 
+
+  handleAddListForm: event => {
+    // to make sure listModule doesn't have to refer to app in its code, we leave the declaration fo the method in app
+    // we delegate the list-specific processing to the module and we clode the modals form app 
+    listModule.handleAddListForm(event);
+    app.hideModals();
+  },
+
+  handleAddCardForm: event => {
+    cardModule.handleAddCardForm(event);
+    app.hideModals();
   },
 
   hideModals: () => {
@@ -45,78 +69,37 @@ const app = {
     }
   },
 
-  showAddListModal: () => {
-    const div = document.getElementById('addListModal');
-    div.classList.add('is-active');
-  },
+  getListsFromAPI: async () => {
+    try {
+      const result = await fetch(`${app.base_url}/lists`);
+      if (result.ok) {
 
-  showAddCardModal: event => {
-    console.log('Je suis dans showAddCardModal');
-    // we get the value of data-list-id by using the reference to the clicked element
-    const listId = event.target.closest('.panel').getAttribute('data-list-id');
-    console.log('List id : ', listId);
-    const div = document.getElementById('addCardModal');
-    // we update the value attribute in the hidden field of the form
-    div.querySelector('[name="list_id"]').value = listId;
-    div.classList.add('is-active');
-  },
-
-  handleAddListForm: event => {
-    // we deactivate the default behaviour to avoid page reload
-    event.preventDefault();
-    // we get the form data and save them into a FormData object
-    // FormData can extract all the inputs inside a <form> element, whatever their nesting level in the html document
-    const formData = new FormData(event.target);
-    // we call the makeListInDOM method and we pass the extracted form info as an argument
-    app.makeListInDOM(formData);
-
-    // we close all modals
-    app.hideModals();
-
-  },
-
-  handleAddCardForm: event => {
-    // we dactivate the default behaviour
-    event.preventDefault();
-    // we get the form info and save them into a FormData object
-    const formData = new FormData(event.target);
-    // we call the makeCardInDOM method and pass the data form as an argument
-    app.makeCardInDOM(formData);
-    // we close all modals
-    app.hideModals();
-  },
-
-  makeListInDOM: data => {
-    // we grab the template
-    const template = document.getElementById('listTemplate');
-    // we will create a new html node by cloning the template AND including all the elements it contains
-    const node = document.importNode(template.content, true);
-    // we create the new list based on the information the user typed in the form
-    node.querySelector('h2').textContent = data.get('name');
-    // in the new list, we add the 'add card' feature
-    // why? Because this feature is applied to existing lists when the page loads, and not on newly created lists
-    node.querySelector('.button--add-card').addEventListener('click', app.showAddCardModal);
-    // we add the html node at the right place, in 1st position of the list of lists
-    document.querySelector('.is-one-quarter').before(node);
-
-  },
-
-  makeCardInDOM: data => {
-    // we grab the card template
-    const template = document.getElementById('cardTemplate');
-    // we create a new node by cloning our template
-    const node = document.importNode(template.content, true);
-    // we set up the new card
-    node.querySelector('.column').textContent = data.get('name');
-    // we add the node at the right place in the DOM
-    // we target the html element which has a data-list-id attribute whose value is the same as list_id in our form
-    // in this element, we target the sub-element with '.panel-block' class: this element is supposed to contain the cards of a list
-    // we add our new card in that element
-    document.querySelector(`[data-list-id="${data.get('list_id')}"] .panel-block`).appendChild(node);
-
+        const json = await result.json();
+        // with fetch, get an array of list objects
+        // To create the lists in the DOM, we loop on this array and, for each element, we call the makeListInDOM method
+        for (const list of json) {
+          listModule.makeListInDOM(list);
+          // for each element of the lists array, we use the cards property which contains a cards array for this list
+          // we loop on this array and, for each element, we call the makeCardInDOM method
+          for (const card of list.cards) {
+            console.log(list.cards);
+            cardModule.makeCardInDOM(card);
+            // if we have elements in the tags property of the card, we loop through the array to create an element per tags
+            if (card.tags) {
+              for (const tag of card.tags) {
+                tagModule.makeTagInDOM(tag, card.id);
+              }
+            }
+          }
+        }
+      } else {
+        console.error('Pépin au niveau du serveur');
+      }
+    } catch (error) {
+      console.error('Impossible de charger les listes depuis l\'API', error);
+    }
   }
-
-};
+}
 
 // we hook an event listener on the document: when the loading is done, we launch app.init
 document.addEventListener('DOMContentLoaded', app.init);
