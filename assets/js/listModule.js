@@ -1,3 +1,5 @@
+const cardModule = require('./cardModule');
+
 const listModule = {
 
   base_url: null,
@@ -181,4 +183,6 @@ const listModule = {
     const h2 = listElement.querySelector('h2');
     h2.classList.remove('is-hidden');
   }
-}
+};
+
+module.exports = listModule;

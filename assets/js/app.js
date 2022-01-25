@@ -1,3 +1,8 @@
+const listModule = require('./listModule');
+const cardModule = require('./cardModule');
+const tagModule = require('./tagModule');
+const utilsModule = require('./utilsModule');
+
 const app = {
   base_url: 'http://localhost:5050',
 
@@ -30,7 +35,7 @@ const app = {
     // we target the close and X buttons and the modal background to add an event listerner to them, which will close the modal
     const closeElements = document.querySelectorAll('.close, .modal-close, .modal-background');
     for (const closeElement of closeElements) {
-      closeElement.addEventListener('click', app.hideModals);
+      closeElement.addEventListener('click', utilsModule.hideModals);
     }
 
     // we target the add form of any list 
@@ -66,23 +71,13 @@ const app = {
     // to make sure listModule doesn't have to refer to app in its code, we leave the declaration fo the method in app
     // we delegate the list-specific processing to the module and we clode the modals form app 
     listModule.handleAddListForm(event);
-    app.hideModals();
+    utilsModule.hideModals();
   },
 
   handleAddCardForm: event => {
     cardModule.handleAddCardForm(event);
-    app.hideModals();
+    utilsModule.hideModals();
   },
-
-  hideModals: () => {
-    // we grab all elements with 'modal' class
-    const modals = document.querySelectorAll('.modal');
-    // we run a loop on the array and, for each element, we remove 'is-active' class
-    for (const modal of modals) {
-      modal.classList.remove('is-active');
-    }
-  },
-
   getListsFromAPI: async () => {
     try {
       const result = await fetch(`${app.base_url}/lists`);
@@ -116,3 +111,5 @@ const app = {
 
 // we hook an event listener on the document: when the loading is done, we launch app.init
 document.addEventListener('DOMContentLoaded', app.init);
+
+module.exports = app;

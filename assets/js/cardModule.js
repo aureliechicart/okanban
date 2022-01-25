@@ -1,3 +1,5 @@
+const tagModule = require('./tagModule');
+
 const cardModule = {
 
   base_url: null,
@@ -32,7 +34,9 @@ const cardModule = {
 
     try {
       // we wait for the DB to answer before going on
-      // thanks to multer which was added to our API, we can directly pass the  formData object in the request's body, Express will know how to extract the info and place them in request.body
+      // thanks to multer which was added to our API, we can directly pass the formData object in the request's body
+      // Express will know how to extract the info and place them in request.body
+      console.log(cardModule.base_url);
       const result = await fetch(`${cardModule.base_url}/cards`, {
         method: 'POST',
         body: formData
@@ -190,4 +194,6 @@ const cardModule = {
     console.log(editForm);
     editForm.classList.add('is-hidden');
   }
-}
+};
+
+module.exports = cardModule;

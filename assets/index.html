@@ -135,8 +135,8 @@
         </header>
         <section class="modal-card-body">
           <div class="select is-multiple is-small is-flex" id="select-tags">
-            <select multiple name="tag-id" id="label-select" data-default-value="default">
-              <option selected value="default">--Sélectionnez un ou plusieurs labels</option>
+            <select multiple size="6" name="tag-id" id="label-select" data-default-value="default">
+              <option selected="selected" value="default">--Sélectionnez un ou plusieurs labels</option>
               <!-- This is where the existing labels go -->
             </select>
           </div>
@@ -308,10 +308,7 @@
 
 
   <!-- Loading of my JS files -->
-  <script src="/js/tagModule.js"></script>
-  <script src="/js/cardModule.js"></script>
-  <script src="/js/listModule.js"></script>
-  <script src="/js/app.js"></script>
+  <script src="dist/bundle.js"></script>
 </body>
 
 </html>

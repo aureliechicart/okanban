@@ -1,3 +1,7 @@
+const { AggregateError } = require('sequelize/dist');
+const { isColString } = require('sequelize/dist/lib/utils');
+const utilsModule = require('./utilsModule');
+
 const tagModule = {
   base_url: null,
 
@@ -27,7 +31,7 @@ const tagModule = {
     document.querySelector(`[data-card-id="${cardId}"] .card__tags`).appendChild(newTag);
 
     // we close the modal
-    app.hideModals();
+    utilsModule.hideModals();
 
   },
   showAddTagForm: (event) => {
@@ -73,7 +77,7 @@ const tagModule = {
         method: 'PATCH',
         body: formData
       };
-      const response = await fetch(`${app.base_url}/tags/${tagId}`, requestParam);
+      const response = await fetch(`${tagModule.base_url}/tags/${tagId}`, requestParam);
 
       if (!response.ok) {
         // if there is an error
@@ -125,7 +129,7 @@ const tagModule = {
 
     try {
       // we check if this tag already exists in DB
-      const response = await fetch(`${app.base_url}/tags`);
+      const response = await fetch(`${tagModule.base_url}/tags`);
       const tags = await response.json();
       const foundTag = tags.find(tag => {
         return tag.name === formData.get('name');
@@ -144,7 +148,7 @@ const tagModule = {
         //   console.log(pair[0] + ', ' + pair[1]);
         // }
 
-        const responseCreate = await fetch(`${app.base_url}/tags`, requestParam);
+        const responseCreate = await fetch(`${tagModule.base_url}/tags`, requestParam);
         // If the operation succeeds
         if (responseCreate.ok) {
           const tag = await responseCreate.json();
@@ -167,7 +171,7 @@ const tagModule = {
           document.querySelector(".tags__block").appendChild(newTag);
 
           // we close the modal
-          app.hideModals();
+          utilsModule.hideModals();
         }
         else {
           const error = await responseCreate.json();
@@ -182,7 +186,7 @@ const tagModule = {
   getTagsFromAPI: async () => {
     // we get all the tags from DB
     try {
-      const response = await fetch(`${app.base_url}/tags`);
+      const response = await fetch(`${tagModule.base_url}/tags`);
       const tags = await response.json();
       for (const tag of tags) {
         // we get the template 
@@ -210,8 +214,8 @@ const tagModule = {
   },
   showAssociateLabelForm: async (event) => {
     // we reset the selection from last opening
-    const tagsSelectElement = document.getElementById('select-tags');
-    tagsSelectElement.setAttribute('default-value', 'default');
+    const tagsSelectDivElement = document.getElementById('select-tags');
+    tagsSelectDivElement.setAttribute('default-value', 'default');
 
     // we get the value of data-list-id by using the reference to the clicked element
     const cardId = event.target.closest('.box').getAttribute('data-card-id');
@@ -222,26 +226,44 @@ const tagModule = {
     associateTagModal.classList.add('is-active');
 
     try {
-      const response = await fetch(`${app.base_url}/tags`);
+      const response = await fetch(`${tagModule.base_url}/tags`);
       const tags = await response.json();
 
+
+      // to avoid duplicates and to plan for newly added tags,
+      // we check first if tag options have already been added to the select element in DOM
       const selectElement = document.getElementById('label-select');
-      // to avoid duplicates and to plan fro newly added tags,
-      // we start by clearing the select element from all tags
-      for (const childNode of selectElement.childNodes) {
-        if (childNode.value !== 'default') {
-          childNode.remove();
+      if (selectElement.children.length > 1) {
+        // if so, we are going to make sur we add only new tags
+        // that were not in DB at the last modal opening
+        const optionsArray = Array.from(selectElement.children);
+
+        for (const tag of tags) {
+
+          // if the tag id is found in the select children
+          if (optionsArray.some(option => parseInt(option.value) === tag.id)) {
+            return;
+          } else {
+            // if not, it means this new tag needs to be added in DOM
+            const option = document.createElement('option');
+            option.textContent = tag.name;
+            option.defaultSelected = false;
+            option.setAttribute('value', tag.id);
+            selectElement.appendChild(option);
+          }
+        }
+      } else {
+        // if it is the first modal opening, no options have been inserted yet
+        // we can directly insert each tag from DB in DOM
+        for (const tag of tags) {
+          const option = document.createElement('option');
+          option.textContent = tag.name;
+          option.defaultSelected = false;
+          option.setAttribute('value', tag.id);
+          selectElement.appendChild(option);
         }
       }
 
-
-      for (const tag of tags) {
-        const option = document.createElement('option');
-        option.textContent = tag.name;
-        option.setAttribute('value', tag.id);
-
-        selectElement.appendChild(option);
-      }
 
     } catch (error) {
       console.log(error);
@@ -268,12 +290,11 @@ const tagModule = {
         }
 
         try {
-          const response = await fetch(`${app.base_url}/cards/${cardId}/tags`, requestParam);
+          const response = await fetch(`${tagModule.base_url}/cards/${cardId}/tags`, requestParam);
           if (response.ok) {
             const newAssociation = await response.json();
 
             const fullTag = newAssociation.tags.find(tag => tag.id === tagId);
-            console.log('fullTag : ', fullTag);
             tagModule.makeTagInDOM(fullTag, cardId);
 
           }
@@ -302,7 +323,7 @@ const tagModule = {
         method: 'DELETE'
       };
 
-      const response = await fetch(`${app.base_url}/cards/${cardId}/tags/${tagId} `, requestParam);
+      const response = await fetch(`${tagModule.base_url}/cards/${cardId}/tags/${tagId} `, requestParam);
 
       if (!response.ok) {
         // If the operation doesn't succeed
@@ -328,7 +349,7 @@ const tagModule = {
       const requestParam = {
         method: 'DELETE'
       };
-      const response = await fetch(`${app.base_url}/tags/${tagId}`, requestParam);
+      const response = await fetch(`${tagModule.base_url}/tags/${tagId}`, requestParam);
       if (!response.ok) {
         // if the operation fails
         const error = await response.json();
@@ -350,3 +371,5 @@ const tagModule = {
 
   }
 };
+
+module.exports = tagModule;
