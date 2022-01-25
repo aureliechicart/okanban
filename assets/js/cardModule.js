@@ -29,14 +29,12 @@ const cardModule = {
     // to respect the selection syntax for an attribute, we have to specify the value of list_id as a string
     // [data-list-id=12] would be incorrect, we have to specify [data-list-id="12"]
     const position = document.querySelectorAll(`[data-list_id="${formData.get('list_id')}"] .box`).length;
-    console.log('position : ', position);
     formData.set('position', position);
 
     try {
       // we wait for the DB to answer before going on
       // thanks to multer which was added to our API, we can directly pass the formData object in the request's body
       // Express will know how to extract the info and place them in request.body
-      console.log(cardModule.base_url);
       const result = await fetch(`${cardModule.base_url}/cards`, {
         method: 'POST',
         body: formData

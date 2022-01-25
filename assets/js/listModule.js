@@ -74,18 +74,15 @@ const listModule = {
     // we add an event listener on the X to trigger the deletion of the list
     node.querySelector('.fa-times').closest('a').addEventListener('click', listModule.deleteList);
 
-    // we add the html node at the right place, in 1st position of the list of lists
-    // we have to add a test to check if the page contains at least one list
-    // if so, we can select it and use the before() method to place the new list
-    // if not, we have to select the lists container and use the appendChild method to insert the first list
-    const firstList = document.querySelector('.is-one-quarter');
+    // on appelle le plugin SortableJS !
+    let container = node.querySelector('.panel-block');
+    new Sortable(container, {
+      group: "list",
+      draggable: ".box",
+      onEnd: listModule.handleDropCard
+    });
 
-    if (firstList) {
-      firstList.before(node);
-    } else {
-      document.querySelector('.card-lists').appendChild(node);
-    }
-
+    document.querySelector('.card-lists').appendChild(node);
   },
 
   deleteList: async event => {
@@ -182,7 +179,50 @@ const listModule = {
     // we make the list title visible again
     const h2 = listElement.querySelector('h2');
     h2.classList.remove('is-hidden');
-  }
+  },
+  handleDropList: (_) => {
+    listModule.updateAllLists();
+  },
+  updateAllLists: () => {
+    document.querySelectorAll('.list-item').forEach((list, position) => {
+      const listId = list.getAttribute('data-list-id');
+      let data = new FormData();
+      data.set('position', position);
+      fetch(`${listModule.base_url}/lists/${listId}`, {
+        method: "PATCH",
+        body: data
+      });
+    });
+  },
+  handleDropCard: (event) => {
+    let originList = event.from;
+    let targetList = event.to;
+
+    // We are goinf to check both lists to update each card
+    let cards = originList.querySelectorAll('.box');
+    let listId = originList.closest('.list-item').getAttribute('data-list-id');
+    listModule.updateAllCards(cards, listId);
+
+    if (originList !== targetList) {
+      cards = targetList.querySelectorAll('.box')
+      listId = targetList.closest('.list-item').getAttribute('data-list-id');
+      listModule.updateAllCards(cards, listId);
+    }
+  },
+  updateAllCards: (cards, listId) => {
+    cards.forEach((card, position) => {
+      const cardId = card.getAttribute('data-card-id');
+      let data = new FormData();
+      data.set('position', position);
+      data.set('list_id', parseInt(listId, 10));
+      fetch(`${listModule.base_url}/cards/${cardId}`, {
+        method: "PATCH",
+        body: data
+      });
+    });
+  },
 };
 
 module.exports = listModule;
+
+`${listModule.base_url}/lists`

@@ -83,10 +83,16 @@ const app = {
       const result = await fetch(`${app.base_url}/lists`);
       if (result.ok) {
 
-        const json = await result.json();
+        const listArray = await result.json();
         // with fetch, get an array of list objects
         // To create the lists in the DOM, we loop on this array and, for each element, we call the makeListInDOM method
-        for (const list of json) {
+
+        // listArray.sort(function(a, b) {
+        //   return a.position - b.position;
+        // });
+        // console.log(listArray);
+
+        for (const list of listArray) {
           listModule.makeListInDOM(list);
           // for each element of the lists array, we use the cards property which contains a cards array for this list
           // we loop on this array and, for each element, we call the makeCardInDOM method
@@ -103,6 +109,15 @@ const app = {
       } else {
         console.error('Pépin au niveau du serveur');
       }
+
+      // we call SortableJS
+      let container = document.querySelector('.card-lists');
+      new Sortable(container, {
+        group: "project",
+        draggable: ".list-item",
+        onEnd: listModule.handleDropList
+      });
+
     } catch (error) {
       console.error('Impossible de charger les listes depuis l\'API', error);
     }
