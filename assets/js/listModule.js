@@ -54,6 +54,9 @@ const listModule = {
     // we make the h2 react to double-click in order to display the edit form
     h2.addEventListener('dblclick', listModule.showListNameForm);
 
+    // we watch for click events on cancel button
+    node.querySelector('.cancel-edit-list-button').addEventListener('click', listModule.closeEditListForm);
+
     // we add an event listener for submit events on the edit form
     node.querySelector('form').addEventListener('submit', listModule.handleListNameForm);
 
@@ -167,5 +170,15 @@ const listModule = {
       h2.classList.remove('is-hidden');
 
     }
+  },
+  closeEditListForm: (event) => {
+    const listElement = event.target.closest('.column .is-one-quarter');
+
+    // we hide the edit list name form
+    const editForm = listElement.querySelector('form[method="PATCH"]');
+    editForm.classList.add('is-hidden');
+    // we make the list title visible again
+    const h2 = listElement.querySelector('h2');
+    h2.classList.remove('is-hidden');
   }
 }

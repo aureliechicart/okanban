@@ -3,23 +3,11 @@
 
 <head>
   <meta charset="utf-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>oKanban</title>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css"
-  >
-  <link
-    rel="stylesheet"
-    href="/css/style.css"
-  >
-  <script
-    defer
-    src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"
-  ></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 </head>
 
 <body>
@@ -36,106 +24,127 @@
           </div>
         </div>
         <div class="column">
-          <button
-            class="button is-light"
-            id="addListButton"
-          >
-            <span class="icon is-small">
-              <i class="fas fa-plus"></i>
-            </span>
-            &nbsp; Ajouter une liste
-          </button>
+          <div class="block">
+            <button class="button is-light" id="addListButton">
+              <span class="icon is-small">
+                <i class="fas fa-plus"></i>
+              </span>
+              &nbsp; Ajouter une liste
+            </button>
+          </div>
+          <div class="block">
+            <button class="button is-light" id="addTagButton">
+              <span class="icon is-small">
+                <i class="fas fa-plus"></i>
+              </span>
+              &nbsp; Ajouter un label
+            </button>
+          </div>
+          <h3 class="title is-5">Labels existants :</h3>
+          <div class="block tags__block">
+          </div>
         </div>
+
 
       </div>
     </div>
   </section>
 
-  <div
-    class="modal"
-    id="addListModal"
-  >
+  <div class="modal" id="addListModal">
     <div class="modal-background"></div>
     <div class="modal-card">
-      <form
-        action=""
-        method="POST"
-      >
+      <form action="" method="POST">
         <header class="modal-card-head modal-card-head-background-primary">
           <p class="modal-card-title">Ajouter une liste</p>
-          <button
-            class="modal-close is-large"
-            type="button"
-            aria-label="close"
-          ></button>
+          <button class="modal-close is-large" type="button" aria-label="close"></button>
         </header>
         <section class="modal-card-body">
           <div class="field">
             <label class="label">Nom</label>
             <div class="control">
-              <input
-                type="text"
-                class="input"
-                name="title"
-                value=""
-                placeholder="Nom de la liste"
-              >
+              <input type="text" class="input" name="name" value="" placeholder="Nom de la liste">
             </div>
           </div>
         </section>
         <footer class="modal-card-foot">
           <button class="button is-info">Enregistrer</button>
-          <button
-            class="button close"
-            type="button"
-          >Annuler</button>
+          <button class="button close" type="button">Annuler</button>
         </footer>
       </form>
     </div>
   </div>
 
-  <div
-    class="modal"
-    id="addCardModal"
-  >
+  <div class="modal" id="addCardModal">
     <div class="modal-background"></div>
     <div class="modal-card">
-      <form
-        action=""
-        method="POST"
-      >
+      <form action="" method="POST">
         <header class="modal-card-head">
           <p class="modal-card-title">Ajouter une carte</p>
-          <button
-            class="modal-close is-large"
-            type="button"
-            aria-label="close"
-          ></button>
+          <button class="modal-close is-large" type="button" aria-label="close"></button>
         </header>
         <section class="modal-card-body">
           <div class="field">
-            <label class="label">Nom</label>
+            <label class="tag">Nom</label>
             <div class="control">
-              <input
-                type="text"
-                class="input"
-                name="content"
-                value=""
-                placeholder="Nom de la liste"
-              >
+              <input type="text" class="input" name="content" value="" placeholder="Nom de la liste">
             </div>
           </div>
-          <input
-            type="hidden"
-            name="list_id"
-          />
         </section>
         <footer class="modal-card-foot">
+          <input type="hidden" name="list_id">
           <button class="button is-info">Enregistrer</button>
-          <button
-            class="button close"
-            type="button"
-          >Annuler</button>
+          <button class="button close" type="button">Annuler</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="addTagModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <form action="" method="POST">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Ajouter un label</p>
+          <button class="delete close" type="button" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+          <div class="field">
+            <label class="tag">Nom</label>
+            <div class="notification is-danger is-hidden tag-exists">Ce label existe déjà. Veuillez entrer
+              un autre nom</div>
+            <div class="control">
+              <input type="text" class="input" name="name" value="" placeholder="Nom du label">
+            </div>
+          </div>
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-success">Enregistrer</button>
+          <button class="button close" type="button">Annuler</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="associateTagModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <form action="" method="POST">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Associer un label</p>
+          <button class="delete close" type="button" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+          <div class="select is-multiple is-small is-flex" id="select-tags">
+            <select multiple name="tag-id" id="label-select" data-default-value="default">
+              <option selected value="default">--Sélectionnez un ou plusieurs labels</option>
+              <!-- This is where the existing labels go -->
+            </select>
+          </div>
+        </section>
+        <footer class="modal-card-foot">
+          <input type="hidden" name="card-id">
+          <button class="button is-success">Enregistrer</button>
+          <button class="button close" type="button">Annuler</button>
         </footer>
       </form>
     </div>
@@ -144,48 +153,37 @@
   <!-- templates -->
   <template id="listTemplate">
     <!-- list -->
-    <div
-      class="column is-one-quarter"
-      data-list-id="C"
-    >
+    <div class="column is-one-quarter" data-list-id="C">
       <div class="panel-heading has-background-grey-darker">
-        <div class="columns">
+        <div class="columns is-flex is-align-items-center">
 
           <div class="column">
             <h2 class="has-text-white">Perso</h2>
 
-            <form
-              action=""
-              method="PATCH"
-              class="is-hidden list-patch-form"
-            >
-              <input
-                type="hidden"
-                name="list-id"
-                value="1"
-              >
-              <div class="field has-addons">
+            <form action="" method="PATCH" class="is-hidden list-patch-form">
+              <input type="hidden" name="list-id" value="1">
+              <div class="field has-addons is-flex is-align-items-center">
                 <div class="control is-expanded">
-                  <input
-                    type="text"
-                    class="input is-small"
-                    name="name"
-                    value=""
-                    placeholder="Nom de la liste"
-                  >
+                  <input type="text" class="input is-small" name="name" value="" placeholder="Nom de la liste">
                 </div>
-                <div class="control">
-                  <button class="button is-small is-info">Valider</button>
+                <div class="control is-flex is-align-items-center">
+                  <button type="submit" href="#" class="cancel-edit-list-button has-background-grey button is-small">
+                    <span class="icon has-text-white">
+                      <i class="fas fa-save"></i>
+                    </span>
+                  </button>
+                  <button type="button" href="#" class="cancel-edit-list-button has-background-grey button is-small">
+                    <span class="icon has-text-white">
+                      <i class="fas fa-times-circle"></i>
+                    </span>
+                  </button>
                 </div>
               </div>
             </form>
           </div>
 
           <div class="column is-narrow is-flex is-justify-content-end">
-            <a
-              href="#"
-              class="button--add-card mr-2"
-            >
+            <a href="#" class="button--add-card mr-2">
               <span class="icon is-small has-text-white">
                 <i class="fas fa-plus"></i>
               </span>
@@ -206,53 +204,108 @@
   </template>
 
   <template id="cardTemplate">
-    <div
-      class="box"
-      data-card-id="I"
-    >
-      <div class="columns">
-        <div class="column">
-          Faire les courses
+    <div class="box" data-card-id="">
+
+      <form action="" method="PATCH" class="is-hidden card-patch-form block">
+        <div class="field has-addons">
+          <div class="control is-expanded">
+            <input type="text" class="input is-small" name="content" value="" placeholder="Titre de la carte">
+          </div>
         </div>
-        <form
-          action=""
-          method="PATCH"
-          class="is-hidden card-patch-form"
-        >
-          <div class="field has-addons">
-            <div class="control is-expanded">
-              <input
-                type="text"
-                class="input is-small"
-                name="content"
-                value=""
-                placeholder="Titre de la carte"
-              >
-            </div>
+        <div class="field has-addons">
+          <div class="control is-expanded">
+            <label class="tag">Couleur</label>
             <div class="control">
-              <button class="button is-small is-info">Valider</button>
+              <input type="color" class="input is-small" name="color" value="#FFFFFF" placeholder="Couleur de la carte">
             </div>
           </div>
-        </form>
-        <div class="column is-narrow">
-          <a href="#">
+        </div>
+        <div class="control">
+          <button type="submit" class="button is-small is-info">Valider</button>
+          <button type="button" class="button cancel-edit-card is-small is-danger">Annuler</button>
+        </div>
+      </form>
+      <div class="columns is-flex is-justify-content-space-between">
+        <div class="column">
+          <!--  Where the card title is added -->
+        </div>
+        <div class="column card-actions-group is-narrow is-pulled-right is-flex is-justify-content-end">
+          <a href="#" class="mr-1">
             <span class="icon is-small has-text-primary">
               <i class="fas fa-pencil-alt"></i>
             </span>
           </a>
-          <a href="#">
+          <a href="#" class="mr-1">
             <span class="icon is-small has-text-danger">
               <i class="fas fa-trash-alt"></i>
             </span>
           </a>
+
         </div>
       </div>
-
-      <!-- we add a container div for labels -->
-      <div class="columns tags"></div>
+      <div class="columns is-flex is-justify-content-space-between is-align-items-center">
+        <div class="column card__tags is-flex is-flex-wrap-wrap">
+          <!-- where the new tag gets added -->
+        </div>
+        <div class="column is-pulled-right is-narrow tag-associate-button-column">
+          <a href="#" class="tag-associate-button" title="Associer un label">
+            <span class="icon is-small has-text-info">
+              <i class="fas fa-tags"></i>
+            </span>
+          </a>
+        </div>
+      </div>
     </div>
-
   </template>
+
+  <template id="tagTemplateforCard">
+    <div class="card__tag__column is-inline-flex is-align-items-center">
+      <span class="card__tag tag is-light" data-tag-id="">
+      </span>
+
+
+      <form action="" method="PATCH" class="is-hidden">
+        <input type="hidden" name="id" value="">
+        <input type="hidden" name="card_id" value="">
+        <div class="field has-addons">
+          <div class="control">
+            <input type="text" class="input is-small" name="name" value="" placeholder="Nom du label">
+          </div>
+          <div class="control">
+            <button class="button is-small is-success">Valider</button>
+          </div>
+        </div>
+      </form>
+
+      <button class="disassociate-tag delete is-small ml-1">
+      </button>
+    </div>
+  </template>
+
+  <template id="tagTemplateforTagList">
+    <div class="card__tag__column is-inline-flex is-align-items-center" data-tag-id="">
+      <span class="card__tag tag is-light">
+      </span>
+
+
+      <form action="" method="PATCH" class="is-hidden">
+        <input type="hidden" name="id" value="">
+        <input type="hidden" name="card_id" value="">
+        <div class="field has-addons">
+          <div class="control">
+            <input type="text" class="input is-small" name="name" value="" placeholder="Nom du label">
+          </div>
+          <div class="control">
+            <button class="button is-small is-success">Valider</button>
+          </div>
+        </div>
+      </form>
+
+      <button class="delete-tag delete is-small ml-1">
+      </button>
+    </div>
+  </template>
+
 
   <!-- Loading of my JS files -->
   <script src="/js/tagModule.js"></script>

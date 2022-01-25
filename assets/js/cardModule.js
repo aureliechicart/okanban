@@ -10,8 +10,9 @@ const cardModule = {
     // we get the value of data-list-id by using the reference to the clicked element
     const listId = event.target.closest('.is-one-quarter').getAttribute('data-list-id');
     const div = document.getElementById('addCardModal');
+    // console.log(div.querySelector('input[name="list_id"]'));
     // we update the value attribute in the hidden field of the form
-    div.querySelector('[name="list_id"]').value = listId;
+    div.querySelector('input[name="list_id"]').value = listId;
     div.classList.add('is-active');
   },
 
@@ -25,7 +26,7 @@ const cardModule = {
     // we select the new card based on the value of list_id we have in the formData object
     // to respect the selection syntax for an attribute, we have to specify the value of list_id as a string
     // [data-list-id=12] would be incorrect, we have to specify [data-list-id="12"]
-    const position = document.querySelectorAll(`[data-list-id="${formData.get('list_id')}"] .box`).length;
+    const position = document.querySelectorAll(`[data-list_id="${formData.get('list_id')}"] .box`).length;
     console.log('position : ', position);
     formData.set('position', position);
 
@@ -75,6 +76,10 @@ const cardModule = {
 
     // we hook an event listener to watch for submit events of the edit form
     box.querySelector('form').addEventListener('submit', cardModule.handleCardTitleForm);
+    // and for clicks on cancel button
+    box.querySelector('button.cancel-edit-card').addEventListener('click', cardModule.closeCardEditForm);
+
+    box.querySelector('.tag-associate-button-column').addEventListener('click', tagModule.showAssociateLabelForm);
 
 
     // we add the node at the right place in the DOM
@@ -125,6 +130,9 @@ const cardModule = {
     // we hide the div containing the title of the card
     const title = div.querySelector('.column');
     title.classList.add('is-hidden');
+    // we hide the action buttons
+    div.querySelector('.card-actions-group').classList.add('is-hidden');
+
     // we display the edit form
     div.querySelector('form').classList.remove('is-hidden');
     // in the input of the form, we add the title of the card as value
@@ -147,6 +155,7 @@ const cardModule = {
     }
 
     const title = event.target.closest('.box').querySelector('.column');
+    const div = event.target.closest('.box');
 
     try {
       // we update the card record in DB via request sent to our API
@@ -161,6 +170,8 @@ const cardModule = {
           // the update was successful
           // we select the div which contains the title to update it
           title.textContent = formData.get('content');
+          div.querySelector('.card-actions-group').classList.remove('is-hidden');
+          cardModule.makeCardInDOM(json);
         } else {
           console.error('Aucune carte mise à jour');
         }
@@ -174,7 +185,9 @@ const cardModule = {
       event.target.classList.add('is-hidden');
     }
   },
-
-
-
+  closeCardEditForm: (event) => {
+    const editForm = event.target.closest('form[method="PATCH"]');
+    console.log(editForm);
+    editForm.classList.add('is-hidden');
+  }
 }
