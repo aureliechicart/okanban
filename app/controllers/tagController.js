@@ -96,7 +96,6 @@ const tagController = {
 
   associateTagToCard: async (req, res) => {
     try {
-      // console.log(req.body);
       const cardId = req.params.id;
       const tagId = req.body.tag_id;
 
@@ -113,10 +112,12 @@ const tagController = {
       }
 
       // we now associate both instances
-      // thanks to Sequelize and mixins methods added to instances (here addTag and removeTag, see https://sequelize.org/master/class/lib/associations/belongs-to-many.js~BelongsToMany.html), we can manipulate the records of liaison table card_has_tag without having to write any SQL line
-      // No need to create a model for this liaison table, everything is managed under the hood
+      // thanks to Sequelize and mixins methods added to instances
+      // (here addTag and removeTag, see https://sequelize.org/master/class/lib/associations/belongs-to-many.js~BelongsToMany.html),
+      // we can manipulate the records of junction table 'card_has_tag' without having to write any SQL line
+      // No need to create a model for this junction table, everything is managed under the hood
       await card.addTag(tag);
-      // unofrtunately the associations of the instance are not updated
+      // unfortunately the associations of the instance are not updated
       // we need to select the instance again to return the updated instance
       card = await Card.findByPk(cardId, {
         include: ['tags']

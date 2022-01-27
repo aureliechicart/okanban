@@ -15,17 +15,14 @@ app.use(express.urlencoded({ extended: true }));
 const mutipartParser = multer();
 app.use(mutipartParser.none());
 
-// we add a sanitizer middleware
+// we add a body sanitizer middleware
 const bodySanitizer = require('./app/middleware/body-sanitizer');
 app.use(bodySanitizer);
 
-// we add the static assets (for the frontend)
-console.log(path.join(__dirname, "./assets"));
+// we add the static assets
 app.use(express.static(path.join(__dirname, "./assets/")));
 
 app.use(router);
-
-
 
 app.listen(PORT, () => {
   console.log(`Listening on ${PORT} ...`);

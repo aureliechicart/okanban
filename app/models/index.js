@@ -2,7 +2,8 @@ const Card = require('./card');
 const List = require('./list');
 const Tag = require('./tag');
 
-/** Associations */
+/** Catalog file */
+// Associations
 
 Card.belongsToMany(Tag, {
     as: 'tags',

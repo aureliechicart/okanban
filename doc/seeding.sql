@@ -12,7 +12,7 @@ VALUES ('Carte 1', '#fff696', 1, 0),
 INSERT INTO "tag" ("name", "color")
 VALUES ('Urgent', '#F00');
 
--- Same for the liaison table
+-- Same for the junction table
 INSERT INTO "card_has_tag" ("card_id", "tag_id")
 VALUES (1,1);
 

@@ -6,29 +6,29 @@ const utilsModule = require('./utilsModule');
 const app = {
   base_url: 'http://localhost:5050',
 
-  // init function, laucnhed upon page load
+  // init function, launched upon page load
   init: async function () {
     console.log('app.init !');
 
-    //we dispatch the base_url info to the modules which need it
+    // we dispatch the base_url info to the modules which need it
     listModule.setBaseUrl(app.base_url);
     cardModule.setBaseUrl(app.base_url);
     tagModule.setBaseUrl(app.base_url);
 
     // upon page load, we want to get the existsing lists in DB
-    // we declared the init method as async: we can wait for the getListsFromAPI function to finish its before running the next instructions
+    // we declared the init method as async: we can wait for the getListsFromAPI function to finish before running the next instructions
     await app.getListsFromAPI();
     await tagModule.getTagsFromAPI();
-    // adding method that will handle the adding done by event listeners
+    // adding method that hooks event listeners
     app.addListenerToActions();
   },
 
   addListenerToActions: () => {
-    // on the add button of lists, we add an event listener to open the modal
+    // on the add list button, we add an event listener to open the modal
     const button = document.getElementById('addListButton');
     button.addEventListener('click', listModule.showAddListModal);
 
-    // on the add tag button, we add an event listener to open the modal
+    // on the add tag button, we add an event listener to open the add tag modal
     const addTagButton = document.getElementById('addTagButton');
     addTagButton.addEventListener('click', tagModule.showAddTagForm);
 
@@ -38,21 +38,11 @@ const app = {
       closeElement.addEventListener('click', utilsModule.hideModals);
     }
 
-    // we target the add form of any list 
+    // we target the add list form modal 
     const form = document.querySelector('#addListModal form');
     form.addEventListener('submit', app.handleAddListForm);
 
-    // In the version without real data, we were adding an EventListener on all add card buttons for the hard-coded lists in the HTML
-    // Now we go through the API to retrieve rela data, calling the method which will register all the listeners will happen after lists are generated in HTML
-    // We have included adding the EventListener at the creation of the list, we don't need to add it here
-
-    // we target the '+' buttons of any card
-    // const addCardButtons = document.getElementsByClassName('button--add-card');
-    // for (const button of addCardButtons) {
-    //   button.addEventListener('click', app.showAddCardModal);
-    // }
-
-    // we target the add form of any card
+    // we target the add card form modal
     const cardForm = document.querySelector('#addCardModal form');
     cardForm.addEventListener('submit', app.handleAddCardForm);
 
@@ -84,13 +74,8 @@ const app = {
       if (result.ok) {
 
         const listArray = await result.json();
-        // with fetch, get an array of list objects
+        // with fetch, we get an array of list objects
         // To create the lists in the DOM, we loop on this array and, for each element, we call the makeListInDOM method
-
-        // listArray.sort(function(a, b) {
-        //   return a.position - b.position;
-        // });
-        // console.log(listArray);
 
         for (const list of listArray) {
           listModule.makeListInDOM(list);
@@ -98,7 +83,7 @@ const app = {
           // we loop on this array and, for each element, we call the makeCardInDOM method
           for (const card of list.cards) {
             cardModule.makeCardInDOM(card);
-            // if we have elements in the tags property of the card, we loop through the array to create an element per tags
+            // if we have elements in the tags property of the card, we loop through the array to create an element per tag
             if (card.tags) {
               for (const tag of card.tags) {
                 tagModule.makeTagInDOM(tag, card.id);
@@ -110,7 +95,10 @@ const app = {
         console.error('Pépin au niveau du serveur');
       }
 
-      // we call SortableJS
+      // we call SortableJS to implement the drag-and-drop
+      // here we delcare the list container as a place where elements can be dragged
+      // the elements to be dragged (individual lists) are specified in the 'draggable' property
+      // when the element dragging ends, we trigger the listModule.handleDropList method
       let container = document.querySelector('.card-lists');
       new Sortable(container, {
         group: "project",
@@ -124,7 +112,7 @@ const app = {
   }
 }
 
-// we hook an event listener on the document: when the loading is done, we launch app.init
+// we hook an event listener on the document: when the loading is done, app.init is launched
 document.addEventListener('DOMContentLoaded', app.init);
 
 module.exports = app;

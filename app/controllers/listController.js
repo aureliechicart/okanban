@@ -18,7 +18,6 @@ const listController = {
           ['cards', 'position', 'ASC']
         ]
       });
-      // console.log(lists);
       res.json(lists);
     } catch (error) {
       console.log(error);
@@ -53,8 +52,9 @@ const listController = {
   createList: async (req, res) => {
     try {
       const { name, position } = req.body;
-      // testing the presence of parameters
+
       const bodyErrors = [];
+      // testing the presence of parameters
       if (!name) {
         bodyErrors.push('name can not be empty');
       }

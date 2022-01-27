@@ -23,7 +23,7 @@ CREATE TABLE "card" (
   "id" INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   "content" TEXT NOT NULL DEFAULT '',
   "color" TEXT NOT NULL DEFAULT '#FFF' ,
-  -- if we want to be bale to delete a list which contains cards, we have to specify "ON DELETE CASCADE" which will make sure to remove all the cards related to that list
+  -- if we want to be able to delete a list which contains cards, we have to specify "ON DELETE CASCADE" which will make sure to remove all the cards related to that list
   "list_id" INTEGER NOT NULL REFERENCES list("id") ON DELETE CASCADE,
   "position" INTEGER NOT NULL DEFAULT 0,
   "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -40,7 +40,7 @@ CREATE TABLE "tag" (
   "updated_at" TIMESTAMPTZ
 );
 
-/* Liaison table ! */
+/* Junction table */
 
 CREATE TABLE "card_has_tag" (
   -- if we want to be able to delete a card or a tag, we have to specify "ON DELETE CASCADE" which will delete all associations related to that deleted card or that deleted tag

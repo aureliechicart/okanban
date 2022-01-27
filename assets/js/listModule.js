@@ -45,12 +45,12 @@ const listModule = {
   },
 
   makeListInDOM: data => {
-    // on we grab the template
+    // we grab the list template
     const template = document.getElementById('listTemplate');
-    // we will create a new html node by cloning the template AND including all the elements it contains
+    // we create a new html node by cloning the template AND including all the elements it contains
     const node = document.importNode(template.content, true);
 
-    // now we use the JSON object we recieved as a parameter to set up our new HTML element
+    // now we use the JSON object we received as a parameter to set up our new HTML element
     const h2 = node.querySelector('h2');
     h2.textContent = data.name;
     // we make the h2 react to double-click in order to display the edit form
@@ -63,7 +63,7 @@ const listModule = {
     node.querySelector('form').addEventListener('submit', listModule.handleListNameForm);
 
 
-    // we take advantage of the creation step to update the info stored in attributes with the data we got from the DB : name and list_id
+    // we take advantage of the creation step to update the info stored in attributes with the data we got from the DB: name and list_id
     node.querySelector('.is-one-quarter').setAttribute('data-list-id', data.id);
     node.querySelector('[name="list-id"]').value = data.id
 
@@ -74,7 +74,9 @@ const listModule = {
     // we add an event listener on the X to trigger the deletion of the list
     node.querySelector('.fa-times').closest('a').addEventListener('click', listModule.deleteList);
 
-    // on appelle le plugin SortableJS !
+    // we call the SortableJS plugin
+    // here we make cards draggable within lists
+    // when thard dragging has ended, we trigger the listModule.handleDropCard method
     let container = node.querySelector('.panel-block');
     new Sortable(container, {
       group: "list",
@@ -132,16 +134,14 @@ const listModule = {
     const formData = new FormData(event.target);
 
     // we check if the user did type in something in the name field
-    // if not, we exit he function and we display an error
+    // if not, we exit the function and we display an error
     if (formData.get('name') === '') {
       console.error('Veuillez saisir un nom pour cette liste');
-      // we use the keyword return to exit the function without running the rest of the code
       return;
     }
 
     const h2 = event.target.closest('.is-one-quarter').querySelector('h2');
 
-    // we will update the list info in DB using fetch
     try {
       // we update the list's name in the DB
       const result = await fetch(`${listModule.base_url}/lists/${formData.get('list-id')}`, {
@@ -181,9 +181,13 @@ const listModule = {
     h2.classList.remove('is-hidden');
   },
   handleDropList: (_) => {
+    // when list dragging ended
     listModule.updateAllLists();
   },
   updateAllLists: () => {
+    // when list dragging ended
+    // we find all list items and we loop through them
+    // we edit the position of each list
     document.querySelectorAll('.list-item').forEach((list, position) => {
       const listId = list.getAttribute('data-list-id');
       let data = new FormData();
@@ -194,22 +198,26 @@ const listModule = {
       });
     });
   },
+  // when card dragging has ended
   handleDropCard: (event) => {
     let originList = event.from;
     let targetList = event.to;
 
-    // We are goinf to check both lists to update each card
+    // We are going to check both lists to update each card
     let cards = originList.querySelectorAll('.box');
     let listId = originList.closest('.list-item').getAttribute('data-list-id');
+    // we provide info to update cards that were move within one list
     listModule.updateAllCards(cards, listId);
 
     if (originList !== targetList) {
       cards = targetList.querySelectorAll('.box')
       listId = targetList.closest('.list-item').getAttribute('data-list-id');
+      // we provide info to update cards that were moved from one list to another
       listModule.updateAllCards(cards, listId);
     }
   },
   updateAllCards: (cards, listId) => {
+    // for each card, we update position and/or list id in DB
     cards.forEach((card, position) => {
       const cardId = card.getAttribute('data-card-id');
       let data = new FormData();

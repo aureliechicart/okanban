@@ -49,7 +49,6 @@ const cardController = {
   createCard: async (req, res) => {
     try {
       const { content, color, list_id } = req.body;
-      // console.log(req.body);
       let bodyErrors = [];
       if (!content) {
         bodyErrors.push(`content can not be empty`);

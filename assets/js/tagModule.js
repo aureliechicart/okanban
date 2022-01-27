@@ -1,5 +1,3 @@
-const { AggregateError } = require('sequelize/dist');
-const { isColString } = require('sequelize/dist/lib/utils');
 const utilsModule = require('./utilsModule');
 
 const tagModule = {
@@ -9,7 +7,7 @@ const tagModule = {
     tagModule.base_url = url;
   },
   makeTagInDOM: (tag, cardId) => {
-    // Get the template
+    // we get the template
     const template = document.querySelector('#tagTemplateforCard');
     // we duplicate the HTML content from the template
     const newTag = document.importNode(template.content, true);
@@ -26,16 +24,14 @@ const tagModule = {
     newTag.querySelector('form').addEventListener('submit', tagModule.handleEditTagForm);
     newTag.querySelector('.disassociate-tag').addEventListener('click', tagModule.handleDissociateTag);
 
-
-    // we insert the tag in DOM within cards with which they are associated
+    // we insert the tag in DOM within cards to which they are associated
     document.querySelector(`[data-card-id="${cardId}"] .card__tags`).appendChild(newTag);
 
     // we close the modal
     utilsModule.hideModals();
 
   },
-  showAddTagForm: (event) => {
-    console.log("ajout de label");
+  showAddTagForm: (_) => {
     // we get the add tag modal
     const tagModal = document.querySelector("#addTagModal");
     // we display the modal
@@ -43,8 +39,6 @@ const tagModule = {
 
   },
   showEditTagForm: (event) => {
-    console.log(`Édition d'un tag`);
-
     // we get the tag which is to be modified
     const tagElement = event.target.closest('.card__tag__column');
 
@@ -60,14 +54,9 @@ const tagModule = {
   },
   handleEditTagForm: async (event) => {
     event.preventDefault();
-    console.log(`submit de l'édition d'un tag`);
 
     // we get the data from the form
     const formData = new FormData(event.target);
-    // for (const pair of formData.entries()) {
-    //   console.log(pair[0] + ', ' + pair[1]);
-    // }
-
     const tagId = formData.get('id');
     const newTagTitle = formData.get('name');
 
@@ -85,7 +74,7 @@ const tagModule = {
         throw error;
       }
 
-      // If it works, we change the span textcontent witht new name
+      // If it works, we change the span textcontent with new name
       const tagElement = event.target.closest('.card__tag__column');
       tagElement.querySelector('.card__tag').textContent = formData.get('name');
 
@@ -99,11 +88,10 @@ const tagModule = {
         tagElement.textContent = newTagTitle;
       }
 
-      // we modify it in the tags block
-      // we clear the tags block and we get the new list of tags
+      // to avoid duplicates elements in DOM, we clear the tags block, then we get the new list of tags
       const tagsDivElement = document.querySelector(".tags__block");
       while (tagsDivElement.firstChild) {
-        tagsDivElement.firstChild.remove()
+        tagsDivElement.firstChild.remove();
       }
       tagModule.getTagsFromAPI();
 
@@ -114,18 +102,12 @@ const tagModule = {
   },
   handleAddTagForm: async (event) => {
     event.preventDefault();
-    console.log(`Soumission de l'ajout d'un tag`);
-    // we hide the error message if it has been triggered at the last opening
+    // we hide the error message in case it had been triggered during the last opening
     document.querySelector(".tag-exists").classList.add("is-hidden");
 
-    // we get data from the foem
+    // we get data from the form
     const formData = new FormData(event.target);
     formData.append('color', '#FFFFFF');
-
-    // we display the key/value pairs
-    // for (const pair of formData.entries()) {
-    //   console.log(pair[0] + ', ' + pair[1]);
-    // }
 
     try {
       // we check if this tag already exists in DB
@@ -136,17 +118,14 @@ const tagModule = {
       });
       // If we find a tag with this name
       if (foundTag) {
-        // we display an error message tot the user
+        // we display an error message to the user
         document.querySelector(".tag-exists").classList.remove("is-hidden");
       } else {
-        // If not we add it in DB
+        // If not, we add it in DB
         const requestParam = {
           method: 'POST',
           body: formData
         }
-        // for (var pair of formData.entries()) {
-        //   console.log(pair[0] + ', ' + pair[1]);
-        // }
 
         const responseCreate = await fetch(`${tagModule.base_url}/tags`, requestParam);
         // If the operation succeeds
@@ -191,7 +170,7 @@ const tagModule = {
       for (const tag of tags) {
         // we get the template 
         const template = document.querySelector('#tagTemplateforTagList');
-        // we duplicate the HTM contained in the template
+        // we duplicate the HTML contained in the template
         const newTag = document.importNode(template.content, true);
         // we update the element text with the new tag name
         newTag.querySelector('.card__tag').textContent = tag.name;
@@ -213,38 +192,45 @@ const tagModule = {
     }
   },
   showAssociateLabelForm: async (event) => {
-    // we reset the selection from last opening
-    const tagsSelectDivElement = document.getElementById('select-tags');
-    tagsSelectDivElement.setAttribute('default-value', 'default');
+    // if it is not the first time this form is used, we need to clear the last selection
+    const selectElement = document.getElementById('label-select');
+    for (const option of selectElement.options) {
+      if (option.value === 'default') {
+        option.selected = true;
+      } else {
+        option.selected = false;
+      }
+    }
 
     // we get the value of data-list-id by using the reference to the clicked element
     const cardId = event.target.closest('.box').getAttribute('data-card-id');
 
+    // we add it in a hidden input in the form
     const associateTagModal = document.getElementById("associateTagModal");
-
     associateTagModal.querySelector('input[name="card-id"]').value = cardId;
+    // we make the modal visible
     associateTagModal.classList.add('is-active');
 
     try {
+      // we get all tags in DB
       const response = await fetch(`${tagModule.base_url}/tags`);
       const tags = await response.json();
 
-
       // to avoid duplicates and to plan for newly added tags,
-      // we check first if tag options have already been added to the select element in DOM
-      const selectElement = document.getElementById('label-select');
+      // we check first if tag options are already present in the DOM
+      // if so, we are going to make sur we add only new tags
+      // that were not in DB at the last modal opening
       if (selectElement.children.length > 1) {
-        // if so, we are going to make sur we add only new tags
-        // that were not in DB at the last modal opening
+        // we transform the HTML Collectrion into an array so we can iterate through it
         const optionsArray = Array.from(selectElement.children);
 
         for (const tag of tags) {
-
-          // if the tag id is found in the select children
+          // if the tag from the DB is found in the DOM
           if (optionsArray.some(option => parseInt(option.value) === tag.id)) {
+            // we don't do anything
             return;
           } else {
-            // if not, it means this new tag needs to be added in DOM
+            // if not, it means this new tag needs to be inserted in DOM
             const option = document.createElement('option');
             option.textContent = tag.name;
             option.defaultSelected = false;
@@ -253,8 +239,8 @@ const tagModule = {
           }
         }
       } else {
-        // if it is the first modal opening, no options have been inserted yet
-        // we can directly insert each tag from DB in DOM
+        // if it is the time the modal is opening, the drop down is empty in DOM
+        // we can directly insert each tag from DB
         for (const tag of tags) {
           const option = document.createElement('option');
           option.textContent = tag.name;
@@ -274,35 +260,54 @@ const tagModule = {
     event.preventDefault();
     const formData = new FormData(event.target);
     const cardId = formData.get('card-id');
+    console.log('carotte');
 
     for (var pair of formData.entries()) {
       // we loop through tag ids in formdata
-      if (pair[0] === 'tag-id') {
+      if (pair[0] === 'tag-id' && pair[1] !== 'default') {
+        console.log('patate');
         const tagId = parseInt(pair[1], 10);
 
-        // we associate this tag with this card  in db
-        const associateFormData = new FormData();
-        associateFormData.append('tag_id', tagId);
-
-        const requestParam = {
-          method: 'POST',
-          body: associateFormData
-        }
-
+        // we check if this tag is already associated with this card
         try {
-          const response = await fetch(`${tagModule.base_url}/cards/${cardId}/tags`, requestParam);
+          const response = await fetch(`${tagModule.base_url}/cards/${cardId}`);
+          console.log('poireau');
           if (response.ok) {
-            const newAssociation = await response.json();
+            console.log('chou');
+            const card = await response.json();
 
-            const fullTag = newAssociation.tags.find(tag => tag.id === tagId);
-            tagModule.makeTagInDOM(fullTag, cardId);
+            const foundTag = card.tags.find(tag => tag.id === tagId);
+            console.log(foundTag);
+            if (!foundTag) {
+              //  if the association doesn't already exist, we can save it in DB
+              // and add the tag in the DOM (card container)
+              const associateFormData = new FormData();
+              associateFormData.append('tag_id', tagId);
 
+              const requestParam = {
+                method: 'POST',
+                body: associateFormData
+              }
+              const response = await fetch(`${tagModule.base_url}/cards/${cardId}/tags`, requestParam);
+              if (response.ok) {
+                const newAssociation = await response.json();
+
+                // we need the full info on the tag to pass it on to the makeTagInDOM method
+                const fullTag = newAssociation.tags.find(tag => tag.id === tagId);
+                tagModule.makeTagInDOM(fullTag, cardId);
+              }
+              else {
+                const error = await response.json();
+                throw error;
+              }
+            } else {
+              utilsModule.hideModals();
+            }
           }
           else {
             const error = await response.json();
             throw error;
           }
-
         } catch (error) {
           console.log(error);
         }
@@ -310,7 +315,6 @@ const tagModule = {
     }
   },
   handleDissociateTag: async (event) => {
-    console.log("Dissociation d'un label");
     // we get the span element of the tag name
     const tagElement = event.target.closest('.card__tag__column');
     const tagId = tagElement.getAttribute("data-tag-id");
@@ -340,7 +344,6 @@ const tagModule = {
     }
   },
   deleteTag: async (event) => {
-    console.log("Suppression d'un label");
     // we get the span element of the tag name
     const tagElement = event.target.closest('.card__tag__column');
     const tagId = tagElement.getAttribute("data-tag-id");
@@ -356,7 +359,7 @@ const tagModule = {
         throw error;
       }
 
-      // If the operation succeeds, we remove the tag from the DOM  in the tags block
+      // If the operation succeeds, we remove the tag from the DOM (tags block)
       tagElement.remove();
 
       // still in the DOM, we remove the tag from all cards it is associated to

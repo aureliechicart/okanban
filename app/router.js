@@ -9,7 +9,7 @@ const tagController = require('./controllers/tagController');
 const router = express.Router();
 
 // Front route which returns index.html
-router.get('/', (req, res) => {
+router.get('/', (_, res) => {
   let filePath = path.join(__dirname, '../index.html');
   res.sendFile( filePath );
 });
@@ -39,7 +39,7 @@ router.delete('/tags/:id', tagController.deleteTag);
 router.post('/cards/:id/tags', tagController.associateTagToCard);
 router.delete('/cards/:cardId/tags/:tagId', tagController.removeTagFromCard);
 
-router.use((req, res) => {
+router.use((_, res) => {
   res.status(404).send('Service does not exists');
 });
 

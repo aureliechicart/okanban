@@ -12,7 +12,6 @@ const cardModule = {
     // we get the value of data-list-id by using the reference to the clicked element
     const listId = event.target.closest('.is-one-quarter').getAttribute('data-list-id');
     const div = document.getElementById('addCardModal');
-    // console.log(div.querySelector('input[name="list_id"]'));
     // we update the value attribute in the hidden field of the form
     div.querySelector('input[name="list_id"]').value = listId;
     div.classList.add('is-active');
@@ -86,7 +85,7 @@ const cardModule = {
 
     // we add the node at the right place in the DOM
     // we target the html element which has a data-list-id attribute whose value is the same as list_id in our form
-    // in this element, we target the sub-element with '.panel-block' class: this element is supposed to contain the cards of a list
+    // in this element, we target the sub-element with '.panel-block' class: this element is the one containing the cards of a list
     // we add our new card in that element
     document.querySelector(`[data-list-id="${data.list_id}"] .panel-block`).appendChild(node);
 
@@ -99,7 +98,7 @@ const cardModule = {
       return;
     }
 
-    // we will identify the card to delete based on our event.target
+    // we identify the card to delete based on our event.target
     const card = event.target.closest('.box');
 
     // we get the id of the card
@@ -152,7 +151,6 @@ const cardModule = {
     // if not, we exit the function and we display an error
     if (formData.get('content') === '') {
       console.error('Veuillez saisir un titre pour cette carte');
-      // we use the keyword return to exit the function without running the rest of the code
       return;
     }
 
@@ -189,7 +187,6 @@ const cardModule = {
   },
   closeCardEditForm: (event) => {
     const editForm = event.target.closest('form[method="PATCH"]');
-    console.log(editForm);
     editForm.classList.add('is-hidden');
   }
 };
