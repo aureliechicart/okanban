@@ -43,7 +43,6 @@ const cardModule = {
       // we test whether the request succeeded (status 200) 
       if (result.ok) {
         const json = await result.json();
-        console.log('makeCardinDOM in hdanleCardForm');
         cardModule.makeCardInDOM(json);
       } else {
         console.error('On a eu un pépin sur le serveur');
@@ -66,7 +65,6 @@ const cardModule = {
 
     // we select the card container based on its CSS class
     const box = node.querySelector('.box');
-    console.log(typeof(data.color));
     box.style.backgroundColor = data.color;
     box.setAttribute('data-card-id', data.id);
 
@@ -165,10 +163,6 @@ const cardModule = {
         body: formData
       });
 
-      for (var pair of formData.entries()) {
-        console.log(pair[0]+ ', ' + pair[1]); 
-    }
-
       if (result.ok) {
         const json = await result.json();
         if (json) {
@@ -178,7 +172,6 @@ const cardModule = {
           if (formData.get('color')) {
             div.style.backgroundColor = formData.get('color');
           }
-          console.log(div.querySelector('.card-actions-group'));
           div.querySelector('.card-actions-group').classList.remove('is-hidden');
         } else {
           console.error('Aucune carte mise à jour');

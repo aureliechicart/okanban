@@ -260,24 +260,19 @@ const tagModule = {
     event.preventDefault();
     const formData = new FormData(event.target);
     const cardId = formData.get('card-id');
-    console.log('carotte');
 
     for (var pair of formData.entries()) {
       // we loop through tag ids in formdata
       if (pair[0] === 'tag-id' && pair[1] !== 'default') {
-        console.log('patate');
         const tagId = parseInt(pair[1], 10);
 
         // we check if this tag is already associated with this card
         try {
           const response = await fetch(`${tagModule.base_url}/cards/${cardId}`);
-          console.log('poireau');
           if (response.ok) {
-            console.log('chou');
             const card = await response.json();
 
             const foundTag = card.tags.find(tag => tag.id === tagId);
-            console.log(foundTag);
             if (!foundTag) {
               //  if the association doesn't already exist, we can save it in DB
               // and add the tag in the DOM (card container)
