@@ -3,7 +3,7 @@
 ## Introduction
 
 This project has been developed for learning purposes.  
-Kanban-style application where it is possible to create cards inside lists.
+Kanban-style application. Possibility to create lists and cards inside those lists, as well as assigning tags (labels) to cards.
 Single page application using vanilla Javascript only.
 
 ## Learning goals
@@ -16,12 +16,12 @@ Single page application using vanilla Javascript only.
 ### API creation
 
 - Using a postgreSQL database, and Sequelize (ORM) to interact with it
-- Declaring a Sequelize model for each table:
+- Declaring a __Sequelize model__ for each table:
   - list
   - card
   - tag
   - card_has_tag
-- Creating CRUD routes for each table (only Create/Delete for the junction table)
+- Creating __CRUD__ routes for each table (only Create/Delete for the card_has_table junction table)
 
 ### JS script
 
@@ -35,19 +35,18 @@ Single page application using vanilla Javascript only.
 
 #### Front code organization
 
-- Javascript front code reorganized in modules for clarity
-- executing browserify to bundle up all our modules into one file served to the browser in a single `<script>` tag
-- thanks to browserify we can use the require method and module.exports in frontend js code the same way we would use it in Node
+- Javascript front code reorganized in __modules__ for clarity
+- executing __browserify__ to bundle up all our modules into one file served to the browser in a single `<script>` tag
 
-#### Usage of browserify and watchify
+#### Usage of browserify and watchify {#browserify}
 
-To create the bundle in a dist folder, based on js modules:
+To create the bundle in a dist folder under assets, based on js modules, run the following command:
 
 ```bash
 npx browserify -e assets/js/app.js -o assets/dist/bundle.js
 ```
 
-To be able to make changes in js modules and automatically recompile the bundle at each change, we use watchify:
+To be able to make changes in js modules and automatically recompile the bundle at each change, execute watchify:
 
 ```bash
 npx watchify -e assets/js/app.js -o assets/dist/bundle.js
@@ -75,7 +74,7 @@ Packages executed with npx (not installed locally):
 
 Clone this repository.
 
-In the terminal, at the root of the folder project, run the following command to install the dependencies :
+In the terminal, at the root of the folder project, run the following command to install the dependencies:
 
 ```bash
 npm i
@@ -94,9 +93,10 @@ psql -d <database_name> -f /database/create_db.sql
 ```
 
 ### Setting Environment Variable
-### Launch Command 
 
-## Usage
+Copy the .env.example file and add the corresponding PG_URL.
+
+### Launch Command
 
 Run the following command to start the server:
 
@@ -104,4 +104,5 @@ Run the following command to start the server:
 npm run dev
 ```
 
-You will then be able to access it at localhost:5050.
+You will then be able to access it at localhost:5050.  
+If you want to use a different port, make sure to change its declaration in index.js and to update the base_url in assets/js/app.js (then regenerate the bundle - [see instructions here](#usage-of-browserify-and-watchify-browserify)).
