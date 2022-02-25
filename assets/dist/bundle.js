@@ -163,6 +163,7 @@ const cardModule = {
       // we test whether the request succeeded (status 200) 
       if (result.ok) {
         const json = await result.json();
+        console.log('makeCardinDOM in hdanleCardForm');
         cardModule.makeCardInDOM(json);
       } else {
         console.error('On a eu un pépin sur le serveur');
@@ -185,6 +186,7 @@ const cardModule = {
 
     // we select the card container based on its CSS class
     const box = node.querySelector('.box');
+    console.log(typeof(data.color));
     box.style.backgroundColor = data.color;
     box.setAttribute('data-card-id', data.id);
 
@@ -203,13 +205,11 @@ const cardModule = {
 
     box.querySelector('.tag-associate-button-column').addEventListener('click', tagModule.showAssociateLabelForm);
 
-
     // we add the node at the right place in the DOM
     // we target the html element which has a data-list-id attribute whose value is the same as list_id in our form
     // in this element, we target the sub-element with '.panel-block' class: this element is the one containing the cards of a list
     // we add our new card in that element
     document.querySelector(`[data-list-id="${data.list_id}"] .panel-block`).appendChild(node);
-
   },
 
   deleteCard: async event => {
@@ -285,14 +285,21 @@ const cardModule = {
         body: formData
       });
 
+      for (var pair of formData.entries()) {
+        console.log(pair[0]+ ', ' + pair[1]); 
+    }
+
       if (result.ok) {
         const json = await result.json();
         if (json) {
           // the update was successful
           // we select the div which contains the title to update it
           title.textContent = formData.get('content');
+          if (formData.get('color')) {
+            div.style.backgroundColor = formData.get('color');
+          }
+          console.log(div.querySelector('.card-actions-group'));
           div.querySelector('.card-actions-group').classList.remove('is-hidden');
-          cardModule.makeCardInDOM(json);
         } else {
           console.error('Aucune carte mise à jour');
         }
@@ -309,6 +316,14 @@ const cardModule = {
   closeCardEditForm: (event) => {
     const editForm = event.target.closest('form[method="PATCH"]');
     editForm.classList.add('is-hidden');
+
+    // we target the container div of a card
+    const div = event.target.closest('.box');
+    // we show again the div containing the title of the card
+    const title = div.querySelector('.column');
+    title.classList.remove('is-hidden');
+    // we show again the action buttons
+    div.querySelector('.card-actions-group').classList.remove('is-hidden');
   }
 };
 
