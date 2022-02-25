@@ -11,6 +11,7 @@ const listModule = {
   showAddListModal: () => {
     const div = document.getElementById('addListModal');
     div.classList.add('is-active');
+    div.querySelector('input').value ='';
   },
 
   handleAddListForm: async event => {

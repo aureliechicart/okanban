@@ -135,9 +135,10 @@ const cardModule = {
     // we update the value attribute in the hidden field of the form
     div.querySelector('input[name="list_id"]').value = listId;
     div.classList.add('is-active');
+    div.querySelector('input').value = '';
   },
 
-  handleAddCardForm: async event => {
+  handleAddCardForm: async (event) => {
     // we deactivate the default behaviour
     event.preventDefault();
     // we get the form info and save them into a FormData object
@@ -312,7 +313,6 @@ const cardModule = {
 };
 
 module.exports = cardModule;
-
 },{"./tagModule":4}],3:[function(require,module,exports){
 const cardModule = require('./cardModule');
 
@@ -327,6 +327,7 @@ const listModule = {
   showAddListModal: () => {
     const div = document.getElementById('addListModal');
     div.classList.add('is-active');
+    div.querySelector('input').value ='';
   },
 
   handleAddListForm: async event => {
